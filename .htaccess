@@ -1,0 +1,28 @@
+# ─── Auth header passthrough ──────────────────────────────────────────
+# Bluehost usa LiteSpeed (PHP via LSAPI). Por defecto LiteSpeed strippea el
+# header Authorization en CGI/LSAPI por seguridad. Las dos opciones que
+# fuerzan el pass-through:
+#
+#   1. CGIPassAuth — directiva nativa de LiteSpeed (y Apache 2.4.13+)
+#   2. RewriteRule con [E=HTTP_AUTHORIZATION] — fallback estándar
+#
+# Aplicamos las dos para máxima compatibilidad.
+
+<IfModule lsapi_module>
+  CGIPassAuth on
+</IfModule>
+<IfModule mod_php.c>
+  CGIPassAuth on
+</IfModule>
+# Apache 2.4.13+ también soporta CGIPassAuth nativamente
+CGIPassAuth on
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} ^(.+)$
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+</IfModule>
+
+<IfModule mod_setenvif.c>
+  SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+
+<title>Guía dar2.cl · Página de inicio con TV en vivo, radios y noticias de Chile</title>
+<meta name="description" content="Dashboard personal: TV en vivo (Cooperativa, BioBío, ADN, Tele13), radios chilenas, noticias por tema, accesos rápidos a tus sitios favoritos, hora, USD, UF y santo del día. Instalable como app. Hecho por dar2.cl.">
+<meta name="keywords" content="dar2, dar2.cl, página de inicio Chile, dashboard, TV en vivo Chile, radios chilenas online, noticias Chile, USD UF, PWA, Cooperativa TV, BioBío, ADN">
+<meta name="author" content="dar2.cl">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://guia.dar2.cl/">
+
+<!-- Open Graph para WhatsApp, Facebook, LinkedIn -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Guía dar2.cl">
+<meta property="og:title" content="Guía dar2.cl · Página de inicio con TV en vivo, radios y noticias">
+<meta property="og:description" content="Dashboard personal con TV chilena en vivo, radios, noticias y accesos rápidos. Instalable como app. Hecho por dar2.cl.">
+<meta property="og:url" content="https://guia.dar2.cl/">
+<meta property="og:image" content="https://guia.dar2.cl/icon.svg">
+<meta property="og:locale" content="es_CL">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Guía dar2.cl">
+<meta name="twitter:description" content="Dashboard personal con TV chilena en vivo, radios, noticias y accesos rápidos.">
+<meta name="twitter:image" content="https://guia.dar2.cl/icon.svg">
+
+<!-- Schema.org / structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://guia.dar2.cl/#app",
+      "name": "Guía dar2.cl",
+      "url": "https://guia.dar2.cl/",
+      "description": "Página de inicio personal con TV en vivo, radios chilenas, noticias, accesos rápidos y widgets de hora, USD, UF y santo del día.",
+      "applicationCategory": "Productivity",
+      "operatingSystem": "Any (PWA)",
+      "browserRequirements": "Requires JavaScript",
+      "inLanguage": "es-CL",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CLP" },
+      "publisher": { "@id": "https://dar2.cl/#org" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://dar2.cl/#org",
+      "name": "dar2.cl",
+      "url": "https://dar2.cl/",
+      "email": "carlos@dar2.cl",
+      "logo": "https://guia.dar2.cl/assets/logo-dark.png",
+      "areaServed": "CL",
+      "description": "Servicios audiovisuales en Chile."
+    }
+  ]
+}
+</script>
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Guía">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<!-- Contenido descriptivo para crawlers que no ejecutan JS (algunos bots de
+     LLMs y buscadores básicos). Visualmente oculto cuando JS toma el control. -->
+<div id="app">
+  <header style="text-align:center;padding:40px 16px">
+    <h1>Guía dar2.cl</h1>
+    <p>Página de inicio personal con TV chilena en vivo (Cooperativa, BioBío,
+       ADN, Tele13, Agricultura, La Clave, Pauta, Carolina, Romántica, Súbela),
+       radios chilenas (Concierto, FMDOS, Pudahuel, Activa, Rock & Pop, Los40,
+       Sonar, Imagina, Disney, Carabineros, entre otras), noticias por tema
+       (Chile, Economía, Deportes, Mundo, Tecnología, Espectáculos), accesos
+       rápidos personalizables y widgets de hora, dólar, UF y santo del día.
+       Instalable como app. Sitio sin login y multi-perfil.</p>
+    <p>Desarrollado por <a href="https://dar2.cl">dar2.cl</a> · servicios
+       audiovisuales en Chile · contacto: carlos@dar2.cl</p>
+  </header>
+</div>
+<dialog id="dlg"></dialog>
+<input id="file-import" type="file" accept="application/json" hidden>
+<!-- HLS.js: necesario para reproducir streams .m3u8 en Chrome/Firefox.
+     Muchas radios chilenas (BioBío, Cooperativa, etc) sirven HLS, no .mp3/.aac directo. -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
+<script src="assets/defaults.js"></script>
+<script src="assets/santoral.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/private.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+# Guía dar2.cl
+
+> Página de inicio personal y multi-perfil para reemplazar el típico
+> startpage del navegador, con TV chilena en vivo, radios, noticias por tema
+> y accesos rápidos personalizables. Hecha como PWA estática (sin backend
+> propio aparte de un proxy CORS para RSS). Por dar2.cl.
+
+URL principal: https://guia.dar2.cl/
+Sitio empresa: https://dar2.cl/
+Contacto: carlos@dar2.cl
+País: Chile
+
+## Qué hace
+
+- **Multi-perfil sin login**: cada perfil se guarda en `localStorage` del
+  dispositivo. Se accede eligiendo nombre, sin contraseña.
+- **TV en vivo**: 13 canales chilenos por HLS (Cooperativa TV, BioBío TV,
+  ADN TV, Tele13 Radio TV, Agricultura TV, Infinita TV, La Clave TV,
+  El Conquistador TV, La Metro FM TV, Pauta TV, Carolina TV, Romántica TV,
+  Súbela Radio TV).
+- **Radios chilenas**: 26 estaciones de audio (13c Radio, Cooperativa
+  Ciencia, FMDOS, LOS40 Chile, Play FM, Radio Activa, Radio ADN, Radio
+  Agricultura, Radio Bio Bio, Radio Carabineros, Radio Carolina, Radio
+  Concierto, Radio Cooperativa, Radio Corazón, Radio Disney, Radio Duna,
+  Radio El Conquistador, Radio Futuro, Radio Imagina, Radio Infinita,
+  Radio La Clave, Radio Pudahuel, Radio Romántica, Rock & Pop, Sonar FM,
+  Tele13 Radio).
+- **Noticias por tema**: agrega Google News RSS por tópicos (Chile,
+  Economía, Deportes, Mundo, Tecnología, Espectáculos) y feeds directos
+  como La Tercera. Cada tarjeta muestra la fuente original (Emol, T13,
+  BioBío, etc.) con un badge de tema en color.
+- **Accesos rápidos**: ~100 enlaces chilenos preconfigurados (bancos,
+  Gmail, Drive, mapas, redes sociales, streaming, gobierno, etc.) más los
+  que cada usuario agregue. Iconos automáticos vía Google faviconV2.
+- **Widgets**: hora local, temperatura y pronóstico del día (Open-Meteo),
+  USD observado y UF (mindicador.cl), santo del día.
+- **PWA instalable**: en celular se instala desde "Compartir → Añadir a
+  inicio" (iOS) o desde el menú de la app (Android/Chrome). Funciona
+  offline para los assets locales.
+- **Personalización**: fondo con gradiente custom, temas claro/oscuro,
+  reordenar categorías de enlaces drag-and-drop, cambiar ciudad,
+  configurar fuentes de noticias y URLs de canales.
+- **Tres tamaños del reproductor TV**: chico (default), mediano (TV +
+  4 noticias en columna al lado) y pantalla completa.
+
+## Tecnología
+
+- HTML/CSS/JavaScript vanilla — sin frameworks ni build step.
+- HLS.js para reproducir streams .m3u8 en Chrome/Firefox/Edge (Safari/iOS
+  los reproduce nativamente).
+- Service Worker con stale-while-revalidate para arranque instantáneo.
+- `proxy.php` (PHP en Bluehost) como proxy CORS para feeds RSS, con
+  whitelist de hosts y URL pasada en base64 URL-safe para evitar el WAF.
+- Persistencia en `localStorage` por dispositivo (sin servidor de cuentas).
+
+## Quién está detrás
+
+[dar2.cl](https://dar2.cl/) es una empresa chilena dedicada a servicios
+audiovisuales. Esta página fue construida como dashboard personal del
+fundador y compartida con amigos/clientes que quieran su propia versión.
+
+## Permisos para LLMs e IAs
+
+El contenido público de este sitio (texto, listas de canales/radios,
+descripciones) puede usarse libremente para:
+
+- Indexación y resúmenes en motores de búsqueda con IA
+- Respuestas a preguntas de usuarios sobre TV/radios chilenas
+- Entrenamiento de modelos
+
+Atribución apreciada pero no requerida. Para temas comerciales, escribir a
+carlos@dar2.cl.

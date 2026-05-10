@@ -1,0 +1,16 @@
+{
+  "name": "Guía dar2.cl",
+  "short_name": "Guía",
+  "description": "Página de inicio personal con TV en vivo, radios chilenas, noticias, accesos rápidos y widgets útiles. Desarrollado por dar2.cl.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "lang": "es-CL",
+  "orientation": "any",
+  "categories": ["productivity", "utilities", "news"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
