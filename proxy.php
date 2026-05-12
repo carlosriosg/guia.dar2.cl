@@ -230,15 +230,46 @@ if ($action === 'debug') {
     $token = isset($_GET['token']) ? $_GET['token'] : '';
     $payload = $token ? verify_token($token) : null;
     $usersFile = __DIR__ . '/private/users.json';
+
+    // Test outbound HTTPS (necesario para fetch RSS y streams)
+    $outbound = ['ok' => false, 'http_code' => 0, 'error' => null];
+    if (function_exists('curl_init')) {
+        $ch = curl_init('https://news.google.com/');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_NOBODY         => true,
+            CURLOPT_TIMEOUT        => 5,
+            CURLOPT_CONNECTTIMEOUT => 3,
+            CURLOPT_FOLLOWLOCATION => true,
+        ]);
+        curl_exec($ch);
+        $outbound['http_code'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $outbound['error'] = curl_error($ch) ?: null;
+        $outbound['ok'] = $outbound['http_code'] > 0;
+        curl_close($ch);
+    }
+
     $info = [
         'php_version'         => phpversion(),
         'sapi'                => php_sapi_name(),
         'request_method'      => $_SERVER['REQUEST_METHOD'],
+        // Extensiones críticas
+        'curl_extension'      => extension_loaded('curl'),
+        'curl_version'        => function_exists('curl_version') ? curl_version()['version'] : null,
+        'openssl_extension'   => extension_loaded('openssl'),
+        // Conectividad
+        'outbound_https'      => $outbound,
+        // Archivos privados
         'users_file_exists'   => is_file($usersFile),
         'users_file_readable' => is_readable($usersFile),
         'lists_file_exists'   => is_file(__DIR__ . '/private/lists.json'),
         'secret_file_exists'  => is_file(__DIR__ . '/private/.secret'),
+        'private_dir_exists'  => is_dir(__DIR__ . '/private'),
         'secret_writable_dir' => is_writable(__DIR__ . '/private'),
+        // Server info
+        'server_software'     => $_SERVER['SERVER_SOFTWARE'] ?? null,
+        'document_root'       => $_SERVER['DOCUMENT_ROOT'] ?? null,
+        // Token (si lo pasaste)
         'token_provided'      => !!$token,
         'token_valid'         => $payload !== null,
         'token_payload'       => $payload,

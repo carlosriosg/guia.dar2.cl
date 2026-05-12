@@ -22,10 +22,21 @@ RUN sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.c
 RUN echo "ServerName localhost" >> /etc/apache2/conf-available/servername.conf \
     && a2enconf servername
 
-# Instalar curl en runtime (útil para healthchecks y debug). La imagen base
-# php:8.3-apache no lo trae.
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+# Instalar dependencias del sistema + extensión PHP cURL.
+# - curl (cli): útil para debug
+# - ca-certificates: para verificación SSL en cURL outbound
+# - libcurl4-openssl-dev: header files necesarios para compilar la
+#   extensión PHP cURL (que proxy.php usa para fetch de RSS y streams)
+# php:8.3-apache trae el binario PHP con CLI cURL pero a veces NO la
+# extensión PHP. Forzamos la instalación con docker-php-ext-install.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl ca-certificates libcurl4-openssl-dev \
+    && docker-php-ext-install curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Asegurar que la extensión esté habilitada (debería estarlo después
+# de docker-php-ext-install, pero por las dudas).
+RUN docker-php-ext-enable curl 2>/dev/null || true
 
 # Copiar todo el sitio al docroot.
 COPY . /var/www/html/
