@@ -1,51 +1,45 @@
 # Dockerfile para deploy en Coolify (o cualquier VPS con Docker).
-# Sirve el sitio estático + procesa los .php (proxy.php necesario para
-# noticias RSS, acceso privado, listas IPTV, etc.).
+# Sirve el sitio + procesa los .php (proxy.php necesario para noticias RSS,
+# acceso privado, listas IPTV, etc.).
 #
 # En Coolify:
-#   1. Crear nueva "Application"
-#   2. Tipo: "Docker Compose" o "Dockerfile"
-#   3. Apuntar al repo Git de este proyecto
-#   4. Coolify detecta este Dockerfile y lo buildea
-#   5. Listo
+#   1. Build Pack: Dockerfile
+#   2. Apuntar al repo Git
+#   3. Coolify detecta este Dockerfile y lo buildea
+#   4. Listo
 
 FROM php:8.3-apache
 
-# Módulos Apache necesarios:
-#  - rewrite: para .htaccess (auth, redirects)
-#  - headers: para los CORS headers de proxy.php
-#  - expires: opcional, para cache-control
-RUN a2enmod rewrite headers expires
+# Habilitar mod_rewrite (necesario para .htaccess de auth header en LiteSpeed,
+# y rewrites en general).
+RUN a2enmod rewrite headers
 
-# Permitir .htaccess en /var/www/html (AllowOverride All)
-RUN sed -i 's!<Directory /var/www/>!<Directory /var/www/>\n\tAllowOverride All!' /etc/apache2/apache2.conf || true
+# Permitir que .htaccess override la config (necesario para Deny from all en
+# /private/, y para rewrites de auth header).
+RUN sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf
 
-# Evitar warning de Apache pidiendo ServerName
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+# Suprimir warning de ServerName (no afecta funcionalidad pero ensucia logs).
+RUN echo "ServerName localhost" >> /etc/apache2/conf-available/servername.conf \
+    && a2enconf servername
 
-# Asegurar PHP procesa los .php (viene en la imagen base php:8.3-apache pero
-# explícito por las dudas)
-RUN echo "AddType application/x-httpd-php .php" > /etc/apache2/conf-available/php-handler.conf \
-    && a2enconf php-handler
+# Instalar curl en runtime (útil para healthchecks y debug). La imagen base
+# php:8.3-apache no lo trae.
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar todo el sitio al docroot
+# Copiar todo el sitio al docroot.
 COPY . /var/www/html/
 
-# La carpeta private/ está en .gitignore (contiene secretos), así que no
-# se copia. La creamos vacía + escribible para que el bootstrap inicial y
-# proxy.php puedan generar .secret y persistir users.json/lists.json.
-# Si Coolify monta un Persistent Volume en /var/www/html/private, sobrescribe
-# este directorio vacío con datos persistentes entre re-deploys.
+# private/ está en .gitignore (contiene secretos), así que no se copia.
+# Lo creamos vacío + escribible para que proxy.php genere .secret y persista
+# users.json/lists.json. Si Coolify monta un volumen acá, lo sobrescribe.
 RUN mkdir -p /var/www/html/private \
+    && printf "Order deny,allow\nDeny from all\n\n<IfModule mod_authz_core.c>\n  Require all denied\n</IfModule>\n" > /var/www/html/private/.htaccess \
     && chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && chmod -R 775 /var/www/html/private
+    && find /var/www/html -type d -exec chmod 755 {} \; \
+    && find /var/www/html -type f -exec chmod 644 {} \; \
+    && chmod 775 /var/www/html/private
 
-# .htaccess dentro de private/ para bloquear acceso web directo a users.json
-RUN printf "Order deny,allow\nDeny from all\n\n<IfModule mod_authz_core.c>\n  Require all denied\n</IfModule>\n" > /var/www/html/private/.htaccess \
-    && chown www-data:www-data /var/www/html/private/.htaccess
-
-# Exponer puerto HTTP estándar
 EXPOSE 80
 
-# CMD viene de la imagen base (apache2-foreground)
+# CMD viene de la imagen base (apache2-foreground) — no lo sobrescribimos.
