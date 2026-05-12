@@ -1,20 +1,21 @@
-# Dockerfile mínimo y robusto para Coolify.
-# php:8.3-apache trae todo lo necesario: PHP 8.3 + Apache + cURL extension +
-# OpenSSL extension. Solo agregamos mod_rewrite + AllowOverride para .htaccess.
+# Dockerfile mínimo para Coolify.
+# Coolify espera el container en puerto 3000 por default — configuramos
+# Apache para escuchar ahí en lugar de 80.
 
 FROM php:8.3-apache
 
-# Habilitar mod_rewrite/headers + permitir .htaccess + suprimir warning ServerName.
-# Todo en un solo RUN para minimizar layers y puntos de falla.
+# Apache en puerto 3000 + mod_rewrite + AllowOverride + suppress ServerName warning.
 RUN a2enmod rewrite headers \
     && sed -ri -e 's!AllowOverride None!AllowOverride All!g' /etc/apache2/apache2.conf \
+    && sed -ri -e 's/Listen 80/Listen 3000/' /etc/apache2/ports.conf \
+    && sed -ri -e 's/:80>/:3000>/' /etc/apache2/sites-available/000-default.conf \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Copiar el sitio + crear /private/ con permisos correctos.
+# Copiar el sitio + crear /private/ con permisos.
 COPY . /var/www/html/
 
 RUN mkdir -p /var/www/html/private \
     && printf "Order deny,allow\nDeny from all\n" > /var/www/html/private/.htaccess \
     && chown -R www-data:www-data /var/www/html
 
-EXPOSE 80
+EXPOSE 3000
