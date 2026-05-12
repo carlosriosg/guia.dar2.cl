@@ -1,6 +1,6 @@
 // Service worker mínimo: cachea los assets locales para arranque instantáneo
 // y para que el navegador ofrezca instalar la app.
-const CACHE = 'guia-v68';
+const CACHE = 'guia-v69';
 const ASSETS = [
   './',
   './index.html',

@@ -21,6 +21,9 @@
       volume: parseFloat(localStorage.getItem('guia.tv.vol') || localStorage.getItem('guia.radio.vol') || '0.7'),
     },
   };
+  // Exponer state para debug desde la consola — útil para diagnosticar
+  // qué está pasando con noticias, perfiles, etc.
+  window.__state = state;
 
   // Captura el evento de Chrome/Edge para ofrecer "Instalar" en el menú.
   // En iOS Safari no existe; ahí el usuario instala desde Compartir → Añadir a inicio.
@@ -1364,6 +1367,7 @@
     const p = currentProfile();
     if (!p) return;
     const sources = profileNewsSources(p);
+    console.log('[noticias] refreshNews — fuentes:', sources);
     if (!sources.length) {
       state.news.items = [];
       const wrap = document.getElementById('news-widget');
@@ -1373,12 +1377,13 @@
     }
     try {
       const items = await loadNews(p);
+      console.log('[noticias] cargadas:', items.length, 'items');
       state.news.items = items;
       state.news.cursor = 0;
       renderNewsCards();
       if (items.length > 3) startNewsAutoRotate();
     } catch (e) {
-      console.warn('news error', e);
+      console.error('[noticias] error al cargar:', e);
     }
   }
 
